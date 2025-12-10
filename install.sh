@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-# ----------------- ENV VARIABLES -----------------
 DOMAIN="${DOMAIN:-node68.lunes.host}"
 PORT="${PORT:-10008}"
 UUID="${UUID:-2584b733-9095-4bec-a7d5-62b473540f7a}"
@@ -9,9 +8,8 @@ HY2_PASSWORD="${HY2_PASSWORD:-vevc.HY2.Password}"
 XRAY_SHA="97f20fed49750c24fc389c2946549ba2a374907e07e9adb2ce75799dd80088d9"
 H2_SHA="8f33568e4b9df7fd848d6216e44b0eba913e330c5c4bb077b3e9a456f318235c"
 
-# ----------------- Download scripts -----------------
-curl -sSL -o app.js https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/app.js
-curl -sSL -o package.json https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/package.json
+curl -sSL -o app.js https://raw.githubusercontent.com/murteg/lune-node/main/app.js
+curl -sSL -o package.json https://raw.githubusercontent.com/murteg/lune-node/main/package.json
 
 # ----------------- Xray -----------------
 mkdir -p /home/container/xy
@@ -24,27 +22,25 @@ unzip -o Xray-linux-64.zip
 rm Xray-linux-64.zip
 mv -f xray xy
 
-curl -sSL -o config.json https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/xray-config.json
+curl -sSL -o config.json https://raw.githubusercontent.com/murteg/lune-node/main/xray-config.json
 sed -i "s/10008/$PORT/g" config.json
 sed -i "s/YOUR_UUID/$UUID/g" config.json
 
 KEYS_FILE="./keys.json"
 
 if [ -f "$KEYS_FILE" ]; then
-  echo "Using existing Xray keys"
-  privateKey=$(jq -r '.privateKey' $KEYS_FILE)
-  publicKey=$(jq -r '.publicKey' $KEYS_FILE)
-  shortId=$(jq -r '.shortId' $KEYS_FILE)
+    echo "Using existing Xray keys"
+    privateKey=$(jq -r '.privateKey' $KEYS_FILE)
+    publicKey=$(jq -r '.publicKey' $KEYS_FILE)
+    shortId=$(jq -r '.shortId' $KEYS_FILE)
 else
-  echo "Generating new Xray keys"
-  keyPair=$(./xy x25519)
-  privateKey=$(echo "$keyPair" | grep "Private key" | awk '{print $3}')
-  publicKey=$(echo "$keyPair" | grep "Public key" | awk '{print $3}')
-  shortId=$(openssl rand -hex 4)
-  echo "{\"privateKey\":\"$privateKey\",\"publicKey\":\"$publicKey\",\"shortId\":\"$shortId\"}" > $KEYS_FILE
+    echo "Generating new Xray keys"
+    keyPair=$(./xy x25519)
+    privateKey=$(echo "$keyPair" | grep "Private key" | awk '{print $3}')
+    publicKey=$(echo "$keyPair" | grep "Public key" | awk '{print $3}')
+    shortId=$(openssl rand -hex 4)
+    echo "{\"privateKey\":\"$privateKey\",\"publicKey\":\"$publicKey\",\"shortId\":\"$shortId\"}" > $KEYS_FILE
 fi
-
-chmod 600 $KEYS_FILE
 
 sed -i "s/YOUR_PRIVATE_KEY/$privateKey/g" config.json
 sed -i "s/YOUR_SHORT_ID/$shortId/g" config.json
@@ -59,15 +55,19 @@ cd /home/container/h2
 curl -sSL -o h2 https://github.com/apernet/hysteria/releases/download/app%2Fv2.6.5/hysteria-linux-amd64
 echo "${H2_SHA}  h2" | sha256sum -c - || { echo "ERROR: Hysteria SHA256 mismatch"; exit 1; }
 
-curl -sSL -o config.yaml https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/hysteria-config.yaml
+curl -sSL -o config.yaml https://raw.githubusercontent.com/murteg/lune-node/main/hysteria-config.yaml
 openssl req -x509 -newkey rsa:2048 -days 3650 -nodes -keyout key.pem -out cert.pem -subj "/CN=$DOMAIN"
-
-chmod 600 key.pem cert.pem
 chmod +x h2
-
 sed -i "s/10008/$PORT/g" config.yaml
 sed -i "s/HY2_PASSWORD/$HY2_PASSWORD/g" config.yaml
 
 encodedHy2Pwd=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$HY2_PASSWORD")
 hy2Url="hysteria2://$encodedHy2Pwd@$DOMAIN:$PORT?insecure=1#lunes-hy2"
 echo $hy2Url >> /home/container/node.txt
+
+chmod 600 keys.json config.json key.pem cert.pem h2
+chmod 700 /home/container/xy /home/container/h2
+
+echo "============================================================"
+echo "✅ Setup completed successfully!"
+echo "============================================================"
