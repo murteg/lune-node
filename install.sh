@@ -6,7 +6,7 @@ UUID="${UUID:-2584b733-9095-4bec-a7d5-62b473540f7a}"
 HY2_PASSWORD="${HY2_PASSWORD:-vevc.HY2.Password}"
 
 # SHA256 для проверки
-XRAY_SHA="97f20fed49750c24fc389c2946549ba2a374907e07e9adb2ce75799dd80088d9"
+XRAY_SHA="f3f69cdccdf3443f25248f65bec0f621a7bd05c9d6fbbd5d9f064a8fce70f0fc"
 H2_SHA="8f33568e4b9df7fd848d6216e44b0eba913e330c5c4bb077b3e9a456f318235c"
 
 curl -sSL -o app.js https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/app.js
@@ -15,7 +15,7 @@ curl -sSL -o package.json https://raw.githubusercontent.com/murteg/lune-node/ref
 # ----------------- Xray -----------------
 mkdir -p /home/container/xy
 cd /home/container/xy
-curl -sSL -o Xray-linux-64.zip https://github.com/XTLS/Xray-core/releases/download/v25.12.8/Xray-linux-64.zip
+curl -sSL -o Xray-linux-64.zip https://github.com/XTLS/Xray-core/releases/download/v25.8.3/Xray-linux-64.zip
 echo "${XRAY_SHA}  Xray-linux-64.zip" | sha256sum -c - || { echo "ERROR: Xray SHA256 mismatch"; exit 1; }
 
 unzip Xray-linux-64.zip
