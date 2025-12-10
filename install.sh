@@ -8,8 +8,8 @@ HY2_PASSWORD="${HY2_PASSWORD:-vevc.HY2.Password}"
 XRAY_SHA="97f20fed49750c24fc389c2946549ba2a374907e07e9adb2ce75799dd80088d9"
 H2_SHA="8f33568e4b9df7fd848d6216e44b0eba913e330c5c4bb077b3e9a456f318235c"
 
-curl -sSL -o app.js https://raw.githubusercontent.com/murteg/lune-node/main/app.js
-curl -sSL -o package.json https://raw.githubusercontent.com/murteg/lune-node/main/package.json
+curl -sSL -o app.js https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/app.js
+curl -sSL -o package.json https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/package.json
 
 # ----------------- Xray -----------------
 mkdir -p /home/container/xy
@@ -22,7 +22,7 @@ unzip -o Xray-linux-64.zip
 rm Xray-linux-64.zip
 mv -f xray xy
 
-curl -sSL -o config.json https://raw.githubusercontent.com/murteg/lune-node/main/xray-config.json
+curl -sSL -o config.json https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/xray-config.json
 sed -i "s/10008/$PORT/g" config.json
 sed -i "s/YOUR_UUID/$UUID/g" config.json
 
@@ -55,7 +55,7 @@ cd /home/container/h2
 curl -sSL -o h2 https://github.com/apernet/hysteria/releases/download/app%2Fv2.6.5/hysteria-linux-amd64
 echo "${H2_SHA}  h2" | sha256sum -c - || { echo "ERROR: Hysteria SHA256 mismatch"; exit 1; }
 
-curl -sSL -o config.yaml https://raw.githubusercontent.com/murteg/lune-node/main/hysteria-config.yaml
+curl -sSL -o config.yaml https://raw.githubusercontent.com/murteg/lune-node/refs/heads/main/hysteria-config.yaml
 openssl req -x509 -newkey rsa:2048 -days 3650 -nodes -keyout key.pem -out cert.pem -subj "/CN=$DOMAIN"
 chmod +x h2
 sed -i "s/10008/$PORT/g" config.yaml
