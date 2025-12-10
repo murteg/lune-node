@@ -7,3 +7,7 @@ tls:
 auth:
   type: password
   password: 'HY2_PASSWORD'
+
+log:
+  level: none
+
