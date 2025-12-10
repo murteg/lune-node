@@ -1,15 +1,6 @@
 const { spawn } = require("child_process");
-const fs = require("fs");
-const path = require("path");
 
-const xyDir = "/home/container/xy";
-const keysFile = path.join(xyDir, "keys.json");
-if (!fs.existsSync(keysFile)) {
-  console.error("[ERROR] Xray keys not found! Please run install.sh first to generate keys.");
-  process.exit(1);
-}
-
-// ----------------- Binary definitions -----------------
+// Binary and config definitions
 const apps = [
   {
     name: "xy",
@@ -23,25 +14,27 @@ const apps = [
   }
 ];
 
+// Run binary with keep-alive
 function runProcess(app) {
   const child = spawn(app.binaryPath, app.args, { stdio: "inherit" });
 
   child.on("exit", (code) => {
-    if (code === 0) {
-      console.log(`[EXIT] ${app.name} exited normally.`);
-    } else {
-      console.warn(`[EXIT] ${app.name} exited with code: ${code}. Restarting in 3s...`);
-      setTimeout(() => runProcess(app), 3000);
-    }
-  });
-
-  child.on("error", (err) => {
-    console.error(`[ERROR] Failed to start ${app.name}:`, err);
+    console.log(`[EXIT] ${app.name} exited with code: ${code}`);
+    console.log(`[RESTART] Restarting ${app.name}...`);
+    setTimeout(() => runProcess(app), 3000); // restart after 3s
   });
 }
 
+// Main execution
 function main() {
-  apps.forEach(runProcess);
+  try {
+    for (const app of apps) {
+      runProcess(app);
+    }
+  } catch (err) {
+    console.error("[ERROR] Startup failed:", err);
+    process.exit(1);
+  }
 }
 
 main();
