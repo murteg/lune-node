@@ -1,7 +1,7 @@
 {
-  "name": "lunes-host",
+  "name": "my-host",
   "version": "1.0.0",
-  "description": "Startup Script for Lunes Host LLC",
+  "description": "Script",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
