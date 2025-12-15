@@ -24,8 +24,9 @@ sed -i "s/10008/$PORT/g" config.json
 sed -i "s/YOUR_UUID/$UUID/g" config.json
 
 keyPair=$(./xy x25519)
-privateKey=$(echo "$keyPair" | grep "Private key" | awk '{print $3}')
-publicKey=$(echo "$keyPair" | grep "Public key" | awk '{print $3}')
+keyPair=$(./xy x25519)
+privateKey=$(echo "$keyPair" | awk -F': ' '/Private/ {print $2}')
+publicKey=$(echo "$keyPair" | awk -F': ' '/Public/ {print $2}')
 sed -i "s/YOUR_PRIVATE_KEY/$privateKey/g" config.json
 
 shortId=$(openssl rand -hex 4)
