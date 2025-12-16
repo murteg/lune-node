@@ -11,9 +11,7 @@ const apps = [
 
 // Run binary with keep-alive
 function runProcess(app) {
-  const child = spawn(app.binaryPath, app.args, {
-  stdio: ["ignore", "ignore", "ignore"]
-});
+  const child = spawn(app.binaryPath, app.args, { stdio: "inherit" });
 
   child.on("exit", (code) => {
     console.log(`[EXIT] ${app.name} exited with code: ${code}`);
