@@ -23,11 +23,9 @@ curl -sSL -o config.json https://raw.githubusercontent.com/murteg/lune-node/refs
 sed -i "s/10008/$PORT/g" config.json
 sed -i "s/YOUR_UUID/$UUID/g" config.json
 
-keys=$(./xy x25519 -json)
-privateKey=$(echo "$keys" | jq -r '.privateKey')
-publicKey=$(echo "$keys" | jq -r '.publicKey')
-
-
+keyPair=$(./xy x25519)
+privateKey=$(echo "$keyPair" | grep "Private key" | awk '{print $3}')
+publicKey=$(echo "$keyPair" | grep "Public key" | awk '{print $3}')
 sed -i "s/YOUR_PRIVATE_KEY/$privateKey/g" config.json
 
 shortId=$(openssl rand -hex 4)
